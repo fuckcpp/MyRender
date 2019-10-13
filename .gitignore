@@ -1,5 +1,10 @@
 Debug/
+Release/
 *.tga
+*.out
+*.exe
+*.swp
+*.txt
 tinyrenderer.vcxproj
 tinyrenderer.vcxproj.filters
 tinyrenderer.vcxproj.user
