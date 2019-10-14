@@ -5,7 +5,7 @@ Release/
 *.exe
 *.swp
 *.txt
-tinyrenderer.vcxproj
-tinyrenderer.vcxproj.filters
-tinyrenderer.vcxproj.user
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 
