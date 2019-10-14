@@ -18,8 +18,8 @@ void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color) {
 	
 	int dy=y1-y0;
 	int dx=x1-x0;
-	float slope=dy/(float)dx;
-	float yadd=0;
+	int dy2=std::abs(dy)*2;
+	int yadd=0;
 	int y=y0;
 	for (int x = x0; x <= x1; x++) {
 		if (steep) {
@@ -28,11 +28,11 @@ void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color) {
 		else {
 			image.set(x, y, color);
 		}
-		yadd+=slope;
-		if(yadd>0.5)
+		yadd+=dy2;
+		if(yadd>dx)
 		{
-			y+=y1>y0?1.:-1.;	
-			yadd-=1.;
+			y+=y1>y0?1:-1;	
+			yadd-=dx*2;
 		}
 	}
 }
