@@ -1,6 +1,4 @@
-#ifndef __IMAGE_H__
-#define __IMAGE_H__
-
+#pragma once
 #include <fstream>
 
 #pragma pack(push,1)
@@ -83,7 +81,7 @@ public:
 	bool flip_vertically();
 	bool scale(int w, int h);
 	TGAColor get(int x, int y);
-	bool set(int x, int y, TGAColor c);
+	bool set(int x, int y, const TGAColor& c);
 	~TGAImage();
 	TGAImage & operator =(const TGAImage &img);
 	int get_width();
@@ -92,5 +90,3 @@ public:
 	unsigned char *buffer();
 	void clear();
 };
-
-#endif //__IMAGE_H__
