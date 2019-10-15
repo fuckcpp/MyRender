@@ -23,7 +23,6 @@ Model::Model(const char* filename)
 			verts_.push_back(v);
 		}else if(!line.compare(0, 2, "f "))
 		{
-			//f 1215 / 1270 / 1215 1258 / 1339 / 1258 1217 / 1275 / 1217
 			iss >> trash;
 			std::vector<int> f;
 			int itrash, idex;
