@@ -1,5 +1,6 @@
 ﻿#include <cmath>
 #include <algorithm>
+#include <iostream>
 #include <cstdlib>
 #include "tgaimage.h"
 #include "Model.h"
@@ -10,6 +11,7 @@ const TGAColor green = TGAColor(0, 255, 0, 255);
 Model* model;
 int width = 3000;
 int height = 2000;
+static int triangles;
 
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color)
 {
@@ -65,21 +67,32 @@ void triangle(Vec2i t0,Vec2i t1,Vec2i t2, TGAImage &image,TGAColor color)
 			image.set(j, t0.y + i, color); // attention, due to int casts t0.y+i != A.y
 		}
 	}
+	triangles++;
 }
 
 void drawModel(Model* model, TGAImage& image)
 {
+	Vec3f lightDir = { 0,0,-1 };
 	for (int i = 0; i < model->nfaces(); i++)
 	{
 		std::vector<int> face = model->face(i);
 		Vec2i screen_coords[3];
+		Vec3f world_pos[3];
+		float intensity;
 		for (int j = 0; j < 3; j++)
 		{
 			Vec3f v = model->Vert(face[j]);
 			screen_coords[j].x = (v.x + 1.) * width / 2;
 			screen_coords[j].y = (v.y + 1.) * height / 2;
+			world_pos[j] = v;
 		}
-		triangle(screen_coords[0], screen_coords[1], screen_coords[2], image, TGAColor(rand() % 255, rand() % 255, rand() % 255, 255));
+		//光照计算
+		Vec3f normal = (world_pos[2] - world_pos[0]) ^ (world_pos[1] - world_pos[0]);
+		intensity = normal.normlize()*lightDir;
+		if (intensity > 0)//back_culling 剔除反面的三角形
+		{
+			triangle(screen_coords[0], screen_coords[1], screen_coords[2], image, TGAColor(intensity * 255, intensity * 255, intensity * 255, 255));
+		}
 	}
 }
 
@@ -92,6 +105,7 @@ int main(int argc, char** argv) {
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
+	std::cout << "triangles"<<triangles << std::endl;
 	delete model;
 	return 0;
 }
