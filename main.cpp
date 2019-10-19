@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cstdlib>
+#include <memory>
 #include "tgaimage.h"
 #include "Model.h"
 
@@ -92,7 +93,7 @@ void drawModel(Model* model, TGAImage& image)
 		float intensity;
 		for (int j = 0; j < 3; j++)
 		{
-			Vec3f v = model->Vert(face[j]);
+			Vec3f v = model->vert(face[j]);
 			screen_coords[j].x = (v.x + 1.) * width / 2;
 			screen_coords[j].y = (v.y + 1.) * height / 2;
 			screen_coords[j].z = (v.z + 1.) * depth / 2;
@@ -120,6 +121,9 @@ int main(int argc, char** argv) {
 	}
 
 	model = new Model("obj/african_head.obj");
+	std::shared_ptr<TGAImage> texture = std::make_shared<TGAImage>();
+	texture->read_tga_file("texture/african_head_diffuse.tga");
+	model->setTexture(texture);
 	drawModel(model,image);
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
