@@ -1,11 +1,11 @@
 Debug/
 Release/
-*.tga
 *.out
 *.exe
 *.swp
 *.txt
+*.tga
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
-
+!texture/*.tga
