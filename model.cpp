@@ -19,14 +19,14 @@ Model::Model(const char* filename)
 		{
 			iss >> trash;//v 字符放到了这里
 			Vec3f v;
-			for (int i = 0; i < 3; i++) iss >> v.raw[i];
+			for (int i = 0; i < 3; i++) iss >> v[i];
 			verts_.push_back(v);
 		}
 		else if (!line.compare(0, 4, "vt  "))
 		{
 			iss >> trash >> trash;//vt 字符放到了这里
 			Vec3f vt;
-			for (int i = 0; i < 3; i++) iss >> vt.raw[i];
+			for (int i = 0; i < 3; i++) iss >> vt[i];
 			vts_.push_back(vt);
 		}
 		else if(!line.compare(0, 2, "f "))
@@ -140,12 +140,12 @@ void Model::draw(TGAImage& image)
 			for (int j = 0; j < 3; j++)
 			{
 				Vec3f uv = this->uv(vt_face[j]);
-				uv_coords[j].u = (1. - uv.x) * getTexture().get_width();
-				uv_coords[j].v = (1. - uv.y) * getTexture().get_height();
+				uv_coords[j].x = (1. - uv.x) * getTexture().get_width();
+				uv_coords[j].y = (1. - uv.y) * getTexture().get_height();
 			}
 			if (intensity > 0)//back_culling 剔除反面的三角形
 			{
-				triangle_frag(screen_coords, uv_coords, getTexture(), image);
+				triangle_frag(screen_coords, uv_coords, getTexture(), intensity, image);
 			}
 		}
 		else

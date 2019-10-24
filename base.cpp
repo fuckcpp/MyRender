@@ -70,7 +70,7 @@ void triangle(Vec3i* t, TGAImage& image, TGAColor color)
 	}
 }
 
-void triangle_frag(Vec3i* t, Vec2i* uv, TGAImage& tex, TGAImage& image)
+void triangle_frag(Vec3i* t, Vec2i* uv, TGAImage& tex, float intensity, TGAImage& image)
 {
 	if (t[0].y == t[1].y && t[0].y == t[2].y) return; // i dont care about degenerate triangles
 	if (t[0].y > t[1].y) { std::swap(t[0], t[1]); std::swap(uv[0], uv[1]); }
@@ -92,17 +92,16 @@ void triangle_frag(Vec3i* t, Vec2i* uv, TGAImage& tex, TGAImage& image)
 			Vec3i P;
 			Vec2i UV;
 			P.x = j;
-			UV.u = uvA.u + alpha * (uvB.u - uvA.u);
+			UV.x = uvA.x + alpha * (uvB.x - uvA.x);
 			P.y = t[0].y + i;
-			UV.v = uvA.v + alpha * (uvB.v - uvA.v);
+			UV.y = uvA.y + alpha * (uvB.y - uvA.y);
 			P.z = A.z * (1 - alpha) + B.z * alpha;
-			TGAColor color = tex.get(UV.u, UV.v);
+			TGAColor color = tex.get(UV.x, UV.y);
 			if (zbuffer[P.y * width + P.x] < P.z)//必须做比较
 			{
 				zbuffer[P.y * width + P.x] = P.z;
-				image.set(P.x, P.y, color); // attention, due to int casts t[0].y+i != A.y
+				image.set(P.x, P.y, TGAColor(color.r * intensity, color.g * intensity, color.b * intensity,1.f)); // attention, due to int casts t[0].y+i != A.y
 			}
 		}
-
 	}
 }
