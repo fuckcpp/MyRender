@@ -1,6 +1,8 @@
 #pragma once
 #include <cmath>
 #include <iostream>
+#include <vector>
+
 template<typename t> struct Vec2
 {
 	t raw[2];
@@ -16,7 +18,7 @@ template<typename t> struct Vec2
 	inline t& operator[](const int i) { return raw[i]; }
 	template<class > friend std::ostream& operator<<(std::ostream& os, Vec2<t>& v);
 };
-template<typename t> struct Vec3
+template<class t> struct Vec3
 {
 	t raw[3];
 	t& x;
@@ -24,6 +26,7 @@ template<typename t> struct Vec3
 	t& z;
 	Vec3<t>() : raw(), x(raw[0]), y(raw[1]), z(raw[2]) { x = y = z = t(); }
 	Vec3<t>(t _x, t _y, t _z) : raw(), x(raw[0]), y(raw[1]), z(raw[2]) { x = _x; y = _y; z = _z; }
+	template <class u> Vec3<t>(const Vec3<u>& v);
 	Vec3<t>(const Vec3<t> &v) : raw(), x(raw[0]), y(raw[1]), z(raw[2]) { *this = v; }
 	
 	Vec3<t>& operator =(const Vec3<t>& v) {
@@ -50,6 +53,9 @@ typedef Vec2<int> Vec2i;
 typedef Vec3<float> Vec3f;
 typedef Vec3<int> Vec3i;
 
+template <> template <> Vec3<int>::Vec3(const Vec3<float>& v);
+template <> template <> Vec3<float>::Vec3(const Vec3<int>& v);
+
 template<class t> std::ostream& operator<<(std::ostream& os, Vec2<t>& v)
 {
 	os << "(" << v.x << ", " << v.y << ")\n";
@@ -61,3 +67,24 @@ template<class t> std::ostream& operator<<(std::ostream& os, Vec3<t>& v)
 	os << "(" << v.x << ", " << v.y << ", " << v.z <<")\n";
 	return os;
 }
+
+const int DEFAULT_ALLOC = 4;
+
+class Matrix
+{
+public:
+	Matrix(int r=DEFAULT_ALLOC,int c=DEFAULT_ALLOC);
+	inline int nrows();
+	inline int ncols();
+
+	static Matrix identity(int demensions);
+	std::vector<float>& operator[](const int i);
+	Matrix operator*(const Matrix& a);
+	Matrix transpose();//?
+	Matrix inverse();
+
+	friend std::ostream& operator<<(std::ostream& s,Matrix& m);
+private:
+	std::vector<std::vector<float>> m;
+	int rows, cols;
+};

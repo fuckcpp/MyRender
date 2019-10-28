@@ -114,7 +114,11 @@ std::vector<int> Model::vt_face(int idx)
 
 void Model::draw(TGAImage& image)
 {
-	Vec3f lightDir = { 0,0,-1 };
+	Matrix Projection = Matrix::identity(4);
+	//Matrix ViewPort = viewport(width/8,height/8,width*3/4,height*3/4);
+	Matrix ViewPort = viewport(0, 0, width , height);
+	Projection[3][2] = -1.f / camera.z;
+
 	for (int i = 0; i < nfaces(); i++)
 	{
 		std::vector<int> face = this->face(i);
@@ -124,9 +128,7 @@ void Model::draw(TGAImage& image)
 		for (int j = 0; j < 3; j++)
 		{
 			Vec3f v = vert(face[j]);
-			screen_coords[j].x = (v.x + 1.) * width / 2;
-			screen_coords[j].y = (v.y + 1.) * height / 2;
-			screen_coords[j].z = (v.z + 1.) * depth / 2;
+			screen_coords[j] = m2v(ViewPort * Projection * v2m(v));
 			world_pos[j] = v;
 		}
 		//¹âÕÕ¼ÆËã
