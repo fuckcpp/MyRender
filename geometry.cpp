@@ -1,20 +1,16 @@
 #include "geometry.h"
 #include <cassert>
 
-template <> template <> Vec3<int>::Vec3<int>(const Vec3<float>& v) : raw(), x(raw[0]), y(raw[1]), z(raw[2]) {
-	x = int(floor(v.x) + .5);
-	y = int(floor(v.y) + .5);
-	z = int(floor(v.z) + .5);
-}
-
-template <> template <> Vec3<float>::Vec3<float>(const Vec3<int>& v) : raw(), x(raw[0]), y(raw[1]), z(raw[2]) {
-	x = v.x;
-	y = v.y;
-	z = v.z;
-}
+template<> Vec3<float>::Vec3(Matrix m) :x(m[0][0] / m[3][0]), y(m[1][0] / m[3][0]), z(m[2][0] / m[3][0]) {}
+template <> template <> Vec3<int>::Vec3<int>(const Vec3<float>& v) : x(int(v.x + .5)), y(int(v.y + .5)), z(int(v.z + .5)) {} 
+template <> template <> Vec3<float>::Vec3<float>(const Vec3<int>& v) : x(v.x), y(v.y), z(v.z) {}
 
 Matrix::Matrix(int r, int c):m(std::vector<std::vector<float>>(r,std::vector<float>(c,0.f))),rows(r),cols(c){ }
-
+Matrix::Matrix(Vec3f v) : m(std::vector<std::vector<float> >(4, std::vector<float>(1, 1.f))), rows(4), cols(1) {
+	m[0][0] = v.x;
+	m[1][0] = v.y;
+	m[2][0] = v.z;
+}
 inline int Matrix::nrows()
 {
 	return rows;

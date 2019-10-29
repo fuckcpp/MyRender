@@ -7,19 +7,6 @@ extern std::vector<int> zbuffer(width* height, std::numeric_limits<int>::min());
 extern Vec3f lightDir = { 0,0,-1 };
 extern Vec3f camera = { 0,0,3 };
 
-Vec3f m2v(Matrix m) {
-	return Vec3f(m[0][0] / m[3][0], m[1][0] / m[3][0], m[2][0] / m[3][0]);
-}
-
-Matrix v2m(Vec3f v) {
-	Matrix m(4, 1);
-	m[0][0] = v.x;
-	m[1][0] = v.y;
-	m[2][0] = v.z;
-	m[3][0] = 1.f;
-	return m;
-}
-
 Matrix viewport(int x, int y, int w, int h) {
 	Matrix m = Matrix::identity(4);
 	m[0][3] = x + w / 2.f;
@@ -127,7 +114,7 @@ void triangle_frag(Vec3i* t, Vec2i* uv, TGAImage& tex, float intensity, TGAImage
 			int index = P.y * width + P.x;
 			if (0 <= index && index < width * height)//防止顶点坐标超出视口范围，导致深度缓冲越界
 			{
-				if (&& zbuffer[index] < P.z)//必须做比较
+				if (zbuffer[index] < P.z)//必须做比较
 				{
 					zbuffer[index] = P.z;
 					image.set(P.x, P.y, TGAColor(color.r * intensity, color.g * intensity, color.b * intensity, 1.f)); // attention, due to int casts t[0].y+i != A.y

@@ -128,13 +128,12 @@ void Model::draw(TGAImage& image)
 		for (int j = 0; j < 3; j++)
 		{
 			Vec3f v = vert(face[j]);
-			screen_coords[j] = m2v(ViewPort * Projection * v2m(v));
+			screen_coords[j] = Vec3f(ViewPort * Projection * Matrix(v));
 			world_pos[j] = v;
 		}
 		//¹âÕÕ¼ÆËã
 		Vec3f normal = (world_pos[2] - world_pos[0]) ^ (world_pos[1] - world_pos[0]);
 		intensity = normal.normlize() * lightDir;
-
 		Vec2i uv_coords[3];
 		if (nvt_faces() && nvts())
 		{
