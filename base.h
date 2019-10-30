@@ -13,5 +13,5 @@ extern Vec3f camera;
 Matrix viewport(int x, int y, int w, int h);
 
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color);
-void triangle(Vec3i* t, TGAImage& image, TGAColor color);
-void triangle_frag(Vec3i* t, Vec2i* uv, TGAImage& tex, float intensity, TGAImage& image);
+void triangle(Vec3i* t, float* ity, TGAImage& image);
+void triangle_frag(Vec3i* t, Vec2i* uv,TGAImage& tex, TGAImage& image);
