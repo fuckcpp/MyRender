@@ -125,13 +125,13 @@ std::vector<int> Model::face(int idx)
 	return faces_[idx];
 }
 
-
 void Model::draw(TGAImage& image)
 {
+	Matrix ModelView = lookat(eye, center, Vec3f(0, 1, 0));
 	Matrix Projection = Matrix::identity(4);
-	//Matrix ViewPort = viewport(width/8,height/8,width*3/4,height*3/4);
-	Matrix ViewPort = viewport(0, 0, width , height);
-	Projection[3][2] = -1.f / camera.z;
+	Matrix ViewPort = viewport(width/8,height/8,width*3/4,height*3/4);
+	//Matrix ViewPort = viewport(0, 0, width , height);
+	Projection[3][2] = -1.f / (eye-center).norm();
 
 	for (int i = 0; i < nfaces(); i++)
 	{
@@ -142,7 +142,7 @@ void Model::draw(TGAImage& image)
 		for (int j = 0; j < 3; j++)
 		{
 			Vec3f v = vert(face[j]);
-			screen_coords[j] = Vec3f(ViewPort * Projection * Matrix(v));
+			screen_coords[j] = Vec3f(ViewPort * Projection * ModelView * Matrix(v));
 			world_pos[j] = v;
 			intensity[j] = norm(i,j) * lightDir;
 		}

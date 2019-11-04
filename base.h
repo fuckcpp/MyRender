@@ -8,9 +8,12 @@ const int depth = 255;
 extern std::vector<int> zbuffer;
 extern Vec3f lightDir;
 extern Vec3f camera;
+extern Vec3f eye;
+extern Vec3f center;
 
-//¡Ÿ ± ”ø⁄
+
 Matrix viewport(int x, int y, int w, int h);
+Matrix lookat(Vec3f eye, Vec3f center, Vec3f up);
 
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color);
 void triangle(Vec3i* t, float* ity, TGAImage& image);

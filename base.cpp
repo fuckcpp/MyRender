@@ -4,8 +4,10 @@
 #include <cstdlib>
 
 extern std::vector<int> zbuffer(width* height, std::numeric_limits<int>::min());
-extern Vec3f lightDir = { 0,0,-1 };
+extern Vec3f lightDir = Vec3f(1,-1,1).normalize();
 extern Vec3f camera = { 0,0,3 };
+extern Vec3f eye(1, 1, 3);
+extern Vec3f center(0, 0, 0);
 
 //裁剪空间到屏幕空间的转换矩阵
 Matrix viewport(int x, int y, int w, int h) {
@@ -18,6 +20,21 @@ Matrix viewport(int x, int y, int w, int h) {
 	m[1][1] = h / 2.f;
 	m[2][2] = depth / 2.f;
 	return m;
+}
+
+Matrix lookat(Vec3f eye, Vec3f center, Vec3f up)
+{
+	Vec3f z = (eye - center).normalize();
+	Vec3f x = (up ^ z).normalize();
+	Vec3f y = (z ^ x).normalize();
+	Matrix res = Matrix::identity(4);
+	for (int i = 0; i < 3; i++) {
+		res[0][i] = x[i];
+		res[1][i] = y[i];
+		res[2][i] = z[i];
+		res[3][i] = -center[i];
+	}
+	return res;
 }
 
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color)

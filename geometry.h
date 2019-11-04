@@ -30,7 +30,7 @@ template<class t> struct Vec3
 	inline Vec3<t> operator*(float f)const { return Vec3<t>(x * f, y * f, z * f); }
 	inline t operator*(const Vec3<t>& V)const { return x * V.x + y * V.y + z * V.z; }
 	float norm() const { return std::sqrt(x * x + y * y + z * z);}
-	Vec3<t>& normlize(t l = 1) { *this = (*this) * (l / norm()); return *this; }
+	Vec3<t>& normalize(t l = 1) { *this = (*this) * (l / norm()); return *this; }
 	inline t& operator[](const int i) { return i <= 0 ? x : (1 == i ? y : z); }
 	template<class > friend std::ostream& operator<<(std::ostream& os, Vec3<t>& v);
 };
