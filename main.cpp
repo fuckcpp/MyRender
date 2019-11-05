@@ -11,9 +11,6 @@ extern std::vector<int> zbuffer;
 int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
 	std::shared_ptr<Model> model = std::make_shared<Model>("obj/african_head.obj");
-	std::unique_ptr<TGAImage> texture(new TGAImage());
-	texture->read_tga_file("texture/african_head_diffuse.tga");
-	model->setTexture(std::move(texture));
 	model->draw(image);
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");

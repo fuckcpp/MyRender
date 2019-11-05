@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-Model::Model(const char* filename)
+Model::Model(const char* filename):diffuse_tex()
 {
 	std::ifstream in;
 	in.open(filename,std::ifstream::in);
@@ -61,16 +61,13 @@ Model::Model(const char* filename)
 
 	in.close();
 
-}
-
-void Model::setTexture(std::unique_ptr<TGAImage> tex)
-{
-	texture = std::move(tex);
+	diffuse_tex.read_tga_file("texture/african_head_diffuse.tga");
+	nm_tex.read_tga_file("texture/african_head_nm.tga");
 }
 
 TGAImage& Model::getTexture()
 {
-	return *texture;
+	return diffuse_tex;
 }
 Model::~Model()
 {

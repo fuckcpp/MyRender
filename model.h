@@ -11,7 +11,6 @@ public:
 	Model(const char* filename);
 	~Model();
 
-	void setTexture(std::unique_ptr<TGAImage> tex);
 	TGAImage& getTexture();
 	int nverts();
 	int nfaces();
@@ -29,5 +28,6 @@ private:
 	std::vector<std::vector<int>> faces_;
 	std::vector<std::vector<int>> vt_faces_;
 	std::vector<std::vector<int>> vn_faces_;
-	std::unique_ptr<TGAImage> texture;
+	TGAImage diffuse_tex;
+	TGAImage nm_tex;
 };
