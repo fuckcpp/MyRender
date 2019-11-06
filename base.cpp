@@ -4,10 +4,19 @@
 #include <cstdlib>
 
 extern std::vector<int> zbuffer(width* height, std::numeric_limits<int>::min());
+extern std::shared_ptr<Model> model = std::make_shared<Model>("obj/african_head.obj");
 extern Vec3f lightDir = Vec3f(1,-1,1).normalize();
 extern Vec3f camera = { 0,0,3 };
 extern Vec3f eye(1, 1, 3);
 extern Vec3f center(0, 0, 0);
+
+extern Matrix ModelView = lookat(eye, center, Vec3f(0, 1, 0));
+extern Matrix Projection = Matrix::identity(4);
+extern Matrix ViewPort = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4);
+//extern Matrix ViewPort = viewport(0, 0, width , height);
+
+extern TGAImage zbufferImage=TGAImage(width, height, TGAImage::GRAYSCALE);
+
 
 //裁剪空间到屏幕空间的转换矩阵
 Matrix viewport(int x, int y, int w, int h) {
@@ -36,6 +45,13 @@ Matrix lookat(Vec3f eye, Vec3f center, Vec3f up)
 	}
 	return res;
 }
+
+Vec3f barycentric(Vec3i A, Vec3i B, Vec3i C, Vec3i P) {
+	Vec3f u = Vec3f(C.x - A.x, B.x - A.x, A.x - P.x) ^ Vec3f(C.y - A.y, B.y - A.y, A.y - P.y);
+	return std::abs(u.z) > .5 ? Vec3f(1.f - (u.x + u.y) / u.z, u.y / u.z, u.x / u.z) : Vec3f(-1, 1, 1); // dont forget that u.z is an integer. If it is zero then triangle ABC is degenerate
+}
+
+
 
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color)
 {
@@ -134,9 +150,61 @@ void triangle_frag(Vec3i* t, Vec2i* uv, TGAImage& tex, TGAImage& image)
 				if (zbuffer[index] < P.z)//必须做比较
 				{
 					zbuffer[index] = P.z;
-					image.set(P.x, P.y, TGAColor(color.r, color.g, color.b, 1.f)); // attention, due to int casts t[0].y+i != A.y
+					image.set(P.x, P.y, color); // attention, due to int casts t[0].y+i != A.y
 				}
 			}
 		}
 	}
+}
+
+void rasterization(Vec3i* t, IShader& shader, TGAImage& image, TGAImage& zbuffer)
+{
+	Vec2i minBox(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+	Vec2i maxBox(-std::numeric_limits<int>::max(), -std::numeric_limits<int>::max());
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			minBox[j] = std::min(minBox[j], t[i][j]);
+			maxBox[j] = std::max(maxBox[j], t[i][j]);
+		}
+	}
+	Vec3i Itr;
+	for(int x = minBox.x; x < maxBox.x; x++)
+	{
+		for (int y = minBox.y; y < maxBox.y; y++)
+		{
+			Itr.x = x;
+			Itr.y = y;
+			Vec3f bary = barycentric(t[0], t[1], t[2], Itr);//遍历三角形所在矩形，计算每个像素的重心坐标
+			//使用重心坐标进行插值计算
+			Itr.z = std::max(0, std::min(255,int(t[0].z*bary.x+ t[1].z * bary.y+ t[2].z * bary.z+.5)));
+			TGAColor color;
+			if (bary.x < 0 || bary.y < 0 || bary.z < 0 || Itr.z < zbuffer.get(x,y)[0]) continue;
+			if (!shader.frag(bary, color))
+			{
+				image.set(Itr.x, Itr.y, color);
+				zbuffer.set(Itr.x, Itr.y, TGAColor(Itr.z));
+			}
+		}
+	}
+}
+
+Vec3i GouraudShader::vert(int face_id, int vertex_id)
+{
+	std::vector<int> face = model->face(face_id);
+	Vec3f v = model->vert(face[vertex_id]);
+	Vec3i screen_coord = Vec3f(ViewPort * Projection * ModelView * Matrix(v));
+	intensity = model->norm(face_id, vertex_id) * lightDir;
+	Vec3f uv = model->uv(face_id, vertex_id);
+	uv_coord.x = uv.x * model->getTexture().get_width();
+	uv_coord.y = (1. - uv.y) * model->getTexture().get_height();
+	return screen_coord;
+}
+
+bool GouraudShader::frag(Vec3f bar, TGAColor& color)
+{
+	Vec2i uv = uv_coords[0] * bar[0] + uv_coords[1] * bar[1] + uv_coords[2] * bar[2];
+	color = model->getTexture().get(uv.x, uv.y);
+	return false;
 }

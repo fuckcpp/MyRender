@@ -5,8 +5,7 @@
 class Matrix;
 template<typename t> struct Vec2
 {
-	t x;//x,y两个引用分别与raw 0 1进行绑定；
-	t y;
+	t x,y;
 	Vec2<t>() { x = y = t(); }
 	Vec2<t>(t _x, t _y) { x = _x; y = _y; }
 	inline Vec2<t> operator+(const Vec2<t>& V)const { return Vec2<t>(x + V.x, y + V.y); }
@@ -17,10 +16,8 @@ template<typename t> struct Vec2
 };
 template<class t> struct Vec3
 {
-	t x;
-	t y;
-	t z;
-	Vec3<t>():x(t()),y(t()),z(t()) {}
+	t x,y,z;
+	Vec3<t>():x(0),y(t()),z(t()) {}
 	Vec3<t>(t _x, t _y, t _z):x(_x),y(_y),z(_z) {}
 	Vec3<t>(Matrix m);
 	template <class u> Vec3<t>(const Vec3<u>& v);

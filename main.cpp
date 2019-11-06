@@ -7,20 +7,31 @@
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red = TGAColor(255, 0, 0, 255);
 const TGAColor green = TGAColor(0, 255, 0, 255);
+extern std::shared_ptr<Model> model;
 extern std::vector<int> zbuffer;
+extern TGAImage zbufferImage;
+extern Matrix Projection;
 int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
-	std::shared_ptr<Model> model = std::make_shared<Model>("obj/african_head.obj");
-	model->draw(image);
+	GouraudShader shader;
+	//模型绘制代码暂时迁移出来
+	Projection[3][2] = -1.f / (eye - center).norm();
+	for (int i = 0; i < model->nfaces(); i++)
+	{
+		std::vector<int> face = model->face(i);
+		Vec3i screen_coords[3];
+		float intensity[3];
+		Vec2i uv_coords[3];
+		for (int j = 0; j < 3; j++)
+		{
+			screen_coords[j] = shader.vert(i,j);
+			intensity[j] = shader.intensity;
+			shader.uv_coords[j] = shader.uv_coord;
+		}
+		rasterization(screen_coords, shader, image, zbufferImage);
+	}
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
-
-	TGAImage zbufferImage(width, height, TGAImage::GRAYSCALE);
-	for (int i = 0; i < width; i++)
-	{
-		for (int j = 0; j < height; j++)
-			zbufferImage.set(i,j, TGAColor(zbuffer[i+width*j],1));
-	}
 	zbufferImage.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	zbufferImage.write_tga_file("zbuffer.tga");
 	return 0;

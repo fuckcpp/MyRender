@@ -3,7 +3,6 @@
 #include <memory>
 #include "geometry.h"
 #include "tgaimage.h"
-#include "base.h"
 
 class Model
 {
@@ -20,7 +19,6 @@ public:
 	Vec3f uv(int i,int j);
 	Vec3f norm(int i, int j);
 	std::vector<int> face(int idx);
-	void draw(TGAImage& image);
 private:
 	std::vector<Vec3f> verts_;
 	std::vector<Vec3f> vts_;
