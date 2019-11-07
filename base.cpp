@@ -52,7 +52,6 @@ Vec3f barycentric(Vec3i A, Vec3i B, Vec3i C, Vec3i P) {
 }
 
 
-
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color)
 {
 	bool steep = false;
@@ -190,21 +189,76 @@ void rasterization(Vec3i* t, IShader& shader, TGAImage& image, TGAImage& zbuffer
 	}
 }
 
+Vec3i DiffuseShader::vert(int face_id, int vertex_id)
+{
+	std::vector<int> face = model->face(face_id);
+	Vec3f v = model->vert(face[vertex_id]);
+	Vec3i screen_coord = Vec3f(ViewPort * Projection * ModelView * Matrix(v));
+	Vec3f uv = model->uv(face_id, vertex_id);
+	uv_coords[vertex_id] = Vec2f(uv.x,uv.y);
+	return screen_coord;
+}
+
+bool DiffuseShader::frag(Vec3f bar, TGAColor& color)	
+{
+	Vec2f uv = uv_coords[0] * bar[0] + uv_coords[1] * bar[1] + uv_coords[2] * bar[2];
+	color = model->diffuse(uv);
+	return false;
+}
+
 Vec3i GouraudShader::vert(int face_id, int vertex_id)
 {
 	std::vector<int> face = model->face(face_id);
 	Vec3f v = model->vert(face[vertex_id]);
 	Vec3i screen_coord = Vec3f(ViewPort * Projection * ModelView * Matrix(v));
-	intensity = model->norm(face_id, vertex_id) * lightDir;
-	Vec3f uv = model->uv(face_id, vertex_id);
-	uv_coord.x = uv.x * model->getTexture().get_width();
-	uv_coord.y = (1. - uv.y) * model->getTexture().get_height();
+
+	intensitys[vertex_id] = model->norm(face_id,vertex_id)*lightDir;
+
 	return screen_coord;
 }
 
 bool GouraudShader::frag(Vec3f bar, TGAColor& color)
 {
-	Vec2i uv = uv_coords[0] * bar[0] + uv_coords[1] * bar[1] + uv_coords[2] * bar[2];
-	color = model->getTexture().get(uv.x, uv.y);
+	float intensity = intensitys[0] * bar[0] + intensitys[1] * bar[1] + intensitys[2] * bar[2];
+	color = TGAColor(255,125,0)*intensity;
+	return false;
+}
+
+Vec3i GouraudSpecShader::vert(int face_id, int vertex_id)
+{
+	std::vector<int> face = model->face(face_id);
+	Vec3f v = model->vert(face[vertex_id]);
+	Vec3i screen_coord = Vec3f(ViewPort * Projection * ModelView * Matrix(v));
+	intensitys[vertex_id] = model->norm(face_id, vertex_id) * lightDir;
+	return screen_coord;
+}
+
+bool GouraudSpecShader::frag(Vec3f bar, TGAColor& color)
+{
+	float intensity = intensitys[0] * bar[0] + intensitys[1] * bar[1] + intensitys[2] * bar[2];
+	intensity = ((float)(int(intensity* 100) / 20) * 20) / 100;
+	color = TGAColor(255, 125, 0) * intensity;
+	return false;
+}
+
+Vec3i PhongShader::vert(int face_id, int vertex_id)
+{
+	std::vector<int> face = model->face(face_id);
+	Vec3f v = model->vert(face[vertex_id]);
+	Vec3i screen_coord = Vec3f(ViewPort * Projection * ModelView * Matrix(v));
+	//uv_coords[vertex_id] = model->uv(face_id, vertex_id);
+	//uv_coords[vertex_id].x = uv.x * model->diffuse_w();
+	//uv_coords[vertex_id].y = (1. - uv.y) * model->diffuse_h();
+	Vec3f uv = model->uv(face_id, vertex_id);
+	uv_coords[vertex_id] = Vec2f(uv.x, uv.y);
+	intensitys[vertex_id] = model->norm(face_id, vertex_id) * lightDir;
+	return screen_coord;
+}
+
+bool PhongShader::frag(Vec3f bar, TGAColor& color)
+{
+	float intensity = intensitys[0] * bar[0] + intensitys[1] * bar[1] + intensitys[2] * bar[2];
+	Vec2f uv = uv_coords[0] * bar[0] + uv_coords[1] * bar[1] + uv_coords[2] * bar[2];
+	color = model->diffuse(uv) * intensity;
 	return false;
 }

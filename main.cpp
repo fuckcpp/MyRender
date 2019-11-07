@@ -13,20 +13,19 @@ extern TGAImage zbufferImage;
 extern Matrix Projection;
 int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
-	GouraudShader shader;
+	//GouraudShader shader;
+	//GouraudSpecShader shader;
+	DiffuseShader shader;
+	//PhongShader shader;
 	//模型绘制代码暂时迁移出来
 	Projection[3][2] = -1.f / (eye - center).norm();
 	for (int i = 0; i < model->nfaces(); i++)
 	{
 		std::vector<int> face = model->face(i);
 		Vec3i screen_coords[3];
-		float intensity[3];
-		Vec2i uv_coords[3];
 		for (int j = 0; j < 3; j++)
 		{
 			screen_coords[j] = shader.vert(i,j);
-			intensity[j] = shader.intensity;
-			shader.uv_coords[j] = shader.uv_coord;
 		}
 		rasterization(screen_coords, shader, image, zbufferImage);
 	}

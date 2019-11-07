@@ -3,8 +3,8 @@
 #include "geometry.h"
 #include "tgaimage.h"
 #include "model.h"
-const int width = 800;
-const int height = 500;
+const int width = 8000;
+const int height = 5000;
 const int depth = 255;
 extern std::vector<int> zbuffer;
 extern std::shared_ptr<Model> model;
@@ -34,14 +34,39 @@ public:
 class GouraudShader :public IShader
 {
 public:
-	float intensity;
-	Vec2i uv_coords[3];
-	Vec2i uv_coord;
+	float intensitys[3];
 	virtual ~GouraudShader() {};
 	virtual Vec3i vert(int face_id, int vertex_id);
 	virtual bool frag(Vec3f bar, TGAColor& color);
 };
 
+class GouraudSpecShader :public IShader
+{
+public:
+	float intensitys[3];
+	virtual ~GouraudSpecShader() {};
+	virtual Vec3i vert(int face_id, int vertex_id);
+	virtual bool frag(Vec3f bar, TGAColor& color);
+};
+
+class DiffuseShader :public IShader
+{
+public:
+	Vec2f uv_coords[3];
+	virtual ~DiffuseShader() {};
+	virtual Vec3i vert(int face_id, int vertex_id);
+	virtual bool frag(Vec3f bar, TGAColor& color);
+};
+
+class PhongShader :public IShader
+{
+public:
+	Vec2f uv_coords[3];
+	float intensitys[3];
+	virtual ~PhongShader() {};
+	virtual Vec3i vert(int face_id, int vertex_id);
+	virtual bool frag(Vec3f bar, TGAColor& color);
+};
 
 Vec3f barycentric(Vec3i A, Vec3i B, Vec3i C, Vec3i P);
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color);

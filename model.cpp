@@ -65,10 +65,13 @@ Model::Model(const char* filename):diffuse_tex()
 	nm_tex.read_tga_file("texture/african_head_nm.tga");
 }
 
-TGAImage& Model::getTexture()
+TGAColor Model::diffuse(Vec2f uv)
 {
-	return diffuse_tex;
+	int w = diffuse_tex.get_width() * uv.x;
+	int h = diffuse_tex.get_height() * (1 - uv.y);
+	return diffuse_tex.get(w,h);
 }
+
 Model::~Model()
 {
 }

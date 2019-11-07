@@ -10,7 +10,7 @@ public:
 	Model(const char* filename);
 	~Model();
 
-	TGAImage& getTexture();
+	TGAColor diffuse(Vec2f uv);
 	int nverts();
 	int nfaces();
 	int nvt_faces();
