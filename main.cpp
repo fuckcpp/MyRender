@@ -12,13 +12,17 @@ extern std::vector<int> zbuffer;
 extern TGAImage zbufferImage;
 extern Matrix Projection;
 int main(int argc, char** argv) {
+	Projection[3][2] = -1.f / (eye - center).norm();
 	TGAImage image(width, height, TGAImage::RGB);
 	//GouraudShader shader;
 	//GouraudSpecShader shader;
 	//DiffuseShader shader;
-	DiffuseLightShader shader;
+	//DiffuseLightShader shader;
 	//模型绘制代码暂时迁移出来
-	Projection[3][2] = -1.f / (eye - center).norm();
+	//DiffuseNormShader shader;
+	PhongShader shader;
+	shader.uniform_M = Projection * ModelView;
+	shader.uniform_MIT = (Projection * ModelView).invert_transpose();
 	for (int i = 0; i < model->nfaces(); i++)
 	{
 		std::vector<int> face = model->face(i);

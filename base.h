@@ -67,18 +67,28 @@ public:
 	virtual Vec4f vert(int face_id, int vertex_id);
 	virtual bool frag(Vec3f bar, TGAColor& color);
 };
-//
-//class DiffuseNormShader :public IShader
-//{
-//public:
-//	Vec2f uv_coords[3];
-//	float intensitys[3];
-//	Matrix uniform_M;
-//	Matrix uniform_MIT;
-//	virtual ~DiffuseNormShader() {};
-//	virtual Vec3i vert(int face_id, int vertex_id);
-//	virtual bool frag(Vec3f bar, TGAColor& color);
-//};
+
+class DiffuseNormShader :public IShader
+{
+public:
+	Vec2f uv_coords[3];
+	Matrix uniform_M;
+	Matrix uniform_MIT;
+	virtual ~DiffuseNormShader() {};
+	virtual Vec4f vert(int face_id, int vertex_id);
+	virtual bool frag(Vec3f bar, TGAColor& color);
+};
+
+class PhongShader :public IShader
+{
+public:
+	Vec2f uv_coords[3];
+	Matrix uniform_M;
+	Matrix uniform_MIT;
+	virtual ~PhongShader() {};
+	virtual Vec4f vert(int face_id, int vertex_id);
+	virtual bool frag(Vec3f bar, TGAColor& color);
+};
 
 Vec3f barycentric(Vec3i A, Vec3i B, Vec3i C, Vec3i P);
 void line(Vec2i v0, Vec2i v1, TGAImage& image, TGAColor color);

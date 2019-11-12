@@ -5,9 +5,9 @@
 
 extern std::vector<int> zbuffer(width* height, std::numeric_limits<int>::min());
 extern std::shared_ptr<Model> model = std::make_shared<Model>("obj/african_head.obj");
-extern Vec3f lightDir = Vec3f(1,-1,1).normalize();
+extern Vec3f lightDir = Vec3f(1,1,1).normalize();
 extern Vec3f camera = { 0,0,3 };
-extern Vec3f eye(1, 1, 3);
+extern Vec3f eye(0, 2, 3);
 extern Vec3f center(0, 0, 0);
 
 extern Matrix ModelView = lookat(eye, center, Vec3f(0, 1, 0));
@@ -276,25 +276,47 @@ bool DiffuseLightShader::frag(Vec3f bar, TGAColor& color)
 	color = model->diffuse(uv) * intensity;
 	return false;
 }
-//
-//Vec3i DiffuseNormShader::vert(int face_id, int vertex_id)
-//{
-//	std::vector<int> face = model->face(face_id);
-//	Vec3f v = model->vert(face[vertex_id]);
-//	Vec3i screen_coord = Vec3f(ViewPort * Projection * ModelView * Matrix(v));
-//	Vec3f uv = model->uv(face_id, vertex_id);
-//	uv_coords[vertex_id] = Vec2f(uv.x, uv.y);
-//	return screen_coord;
-//}
-//
-//bool DiffuseNormShader::frag(Vec3f bar, TGAColor& color)
-//{
-//	Vec2f uv = uv_coords[0] * bar[0] + uv_coords[1] * bar[1] + uv_coords[2] * bar[2];
-//	
-//	Vec3f n = model->norm(uv);
-//
-//	lightDir;
-//
-//	color = model->diffuse(uv);
-//	return false;
-//}
+
+Vec4f DiffuseNormShader::vert(int face_id, int vertex_id)
+{
+	std::vector<int> face = model->face(face_id);
+	Vec4f screen_coord = embed<4>(model->vert(face[vertex_id]));
+	screen_coord = ViewPort * Projection * ModelView * screen_coord;
+	Vec3f uv = model->uv(face_id, vertex_id);
+	uv_coords[vertex_id] = Vec2f(uv.x, uv.y);
+	return screen_coord;
+}
+
+bool DiffuseNormShader::frag(Vec3f bar, TGAColor& color)
+{
+	Vec2f uv = uv_coords[0] * bar[0] + uv_coords[1] * bar[1] + uv_coords[2] * bar[2];
+	Vec3f n = proj<3>(uniform_MIT * embed<4>(model->norm(uv))).normalize();
+	Vec3f l = proj<3>(uniform_M * embed<4>(lightDir)).normalize();
+	float intensity = std::max(0.f, n * l);
+	color = model->diffuse(uv) * intensity;
+	return false;
+}
+
+Vec4f PhongShader::vert(int face_id, int vertex_id)
+{
+	std::vector<int> face = model->face(face_id);
+	Vec4f screen_coord = embed<4>(model->vert(face[vertex_id]));
+	screen_coord = ViewPort * Projection * ModelView * screen_coord;
+	Vec3f uv = model->uv(face_id, vertex_id);
+	uv_coords[vertex_id] = Vec2f(uv.x, uv.y);
+	return screen_coord;
+}
+
+bool PhongShader::frag(Vec3f bar, TGAColor& color)
+{
+	Vec2f uv = uv_coords[0] * bar[0] + uv_coords[1] * bar[1] + uv_coords[2] * bar[2];
+	Vec3f n = proj<3>(uniform_MIT * embed<4>(model->norm(uv))).normalize();
+	Vec3f l = proj<3>(uniform_M * embed<4>(lightDir)).normalize();
+	Vec3f r = (n * (n * l * 2.f) - l).normalize();
+	float spec = pow(std::max(r.z, 0.f), model->spec(uv));
+	float diff = std::max(0.f, n * l);
+	TGAColor c = model->diffuse(uv);
+	color = c;
+	for (int i = 0; i < 3; i++) color[i] = std::min<float>(5 + c[i] * (diff + .6 * spec), 255);
+	return false;
+}

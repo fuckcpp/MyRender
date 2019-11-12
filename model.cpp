@@ -63,6 +63,7 @@ Model::Model(const char* filename):diffuse_tex()
 
 	diffuse_tex.read_tga_file("texture/african_head_diffuse.tga");
 	nm_tex.read_tga_file("texture/african_head_nm.tga");
+	spec_tex.read_tga_file("texture/african_head_spec.tga");
 }
 
 TGAColor Model::diffuse(Vec2f uv)
@@ -129,6 +130,13 @@ Vec3f Model::norm(Vec2f uv)
 	for (int i = 0; i < 3; i++)
 		res[2 - i] = (float)c[i] / 255.f * 2.f - 1.f;
 	return res;
+}
+
+float Model::spec(Vec2f uv)
+{
+	int w = spec_tex.get_width() * uv.x;
+	int h = spec_tex.get_height() * (1 - uv.y);
+	return spec_tex.get(w, h)[0]/1.f;
 }
 
 std::vector<int> Model::face(int idx)

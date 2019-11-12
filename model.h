@@ -19,6 +19,7 @@ public:
 	Vec3f uv(int i,int j);
 	Vec3f norm(int i, int j);
 	Vec3f norm(Vec2f uv);
+	float spec(Vec2f uv);
 	std::vector<int> face(int idx);
 private:
 	std::vector<Vec3f> verts_;
@@ -29,4 +30,5 @@ private:
 	std::vector<std::vector<int>> vn_faces_;
 	TGAImage diffuse_tex;
 	TGAImage nm_tex;
+	TGAImage spec_tex;
 };
