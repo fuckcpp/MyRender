@@ -15,14 +15,14 @@ int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
 	//GouraudShader shader;
 	//GouraudSpecShader shader;
-	DiffuseShader shader;
-	//PhongShader shader;
+	//DiffuseShader shader;
+	DiffuseLightShader shader;
 	//模型绘制代码暂时迁移出来
 	Projection[3][2] = -1.f / (eye - center).norm();
 	for (int i = 0; i < model->nfaces(); i++)
 	{
 		std::vector<int> face = model->face(i);
-		Vec3i screen_coords[3];
+		Vec4f screen_coords[3];
 		for (int j = 0; j < 3; j++)
 		{
 			screen_coords[j] = shader.vert(i,j);

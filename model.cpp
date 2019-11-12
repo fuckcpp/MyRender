@@ -120,6 +120,17 @@ Vec3f Model::norm(int i, int j)
 		return Vec3f();
 }
 
+Vec3f Model::norm(Vec2f uv)
+{
+	int w = nm_tex.get_width() * uv.x;
+	int h = nm_tex.get_height() * (1 - uv.y);
+	TGAColor c = nm_tex.get(w, h);
+	Vec3f res;
+	for (int i = 0; i < 3; i++)
+		res[2 - i] = (float)c[i] / 255.f * 2.f - 1.f;
+	return res;
+}
+
 std::vector<int> Model::face(int idx)
 {
 	return faces_[idx];
