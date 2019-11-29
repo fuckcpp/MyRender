@@ -61,9 +61,9 @@ Model::Model(const char* filename):diffuse_tex()
 
 	in.close();
 
-	diffuse_tex.read_tga_file("texture/african_head_diffuse.tga");
-	nm_tex.read_tga_file("texture/african_head_nm.tga");
-	spec_tex.read_tga_file("texture/african_head_spec.tga");
+	diffuse_tex.read_tga_file("obj/african_head/african_head_diffuse.tga");
+	nm_tex.read_tga_file("obj/african_head/african_head_nm.tga");
+	spec_tex.read_tga_file("obj/african_head/african_head_spec.tga");
 }
 
 TGAColor Model::diffuse(Vec2f uv)

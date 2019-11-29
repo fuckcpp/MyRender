@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 extern std::vector<int> zbuffer(width* height, std::numeric_limits<int>::min());
-extern std::shared_ptr<Model> model = std::make_shared<Model>("obj/african_head.obj");
+extern std::shared_ptr<Model> model = std::make_shared<Model>("obj/african_head/african_head.obj");
 extern Vec3f lightDir = Vec3f(1,1,1).normalize();
 extern Vec3f camera = { 0,0,3 };
 extern Vec3f eye(0, 2, 3);
@@ -302,9 +302,10 @@ Vec4f PhongShader::vert(int face_id, int vertex_id)
 	std::vector<int> face = model->face(face_id);
 	Vec4f screen_coord = embed<4>(model->vert(face[vertex_id]));
 	screen_coord = ViewPort * Projection * ModelView * screen_coord;
-	Vec3f uv = model->uv(face_id, vertex_id);
+	Vec3f uv = model->uv(face_id, vertex_id);//phong着色使用模型自带的顶点uv，再插值计算每个像素的uv
 	uv_coords[vertex_id] = Vec2f(uv.x, uv.y);
 	return screen_coord;
+
 }
 
 bool PhongShader::frag(Vec3f bar, TGAColor& color)
